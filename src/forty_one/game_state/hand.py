@@ -3,7 +3,7 @@ from forty_one import Card, CardSuit
 
 class Hand:
     def __init__(self, cards: list[Card]):
-        self.cards = cards
+        self._cards = cards
 
     def add(self, card: Card):
         """
@@ -11,35 +11,45 @@ class Hand:
         """
         Card.ensure_a_card_class(card)
 
-        self.cards.append(card)
+        self._cards.append(card)
 
-    def remove_by_index(self, index: int):
+    def card_at(self, index: int):
+        """
+        get card by its index position
+        """
+        return self._cards[index]
+
+    def index_of(self, card: Card):
+        Card.ensure_a_card_class(card)
+
+        return self._cards.index(card)
+
+    def discard_at(self, index: int):
         """
         Delete a card from hand via its index
         """
-        if not isinstance(index, int) or index < 0 or index > len(self.cards):
-            raise ValueError(
-                "index must be a number within range 0 and length of cards"
-            )
+        self._cards.pop(index)
 
-        self.cards.pop(index)
-
-    def remove_by_value(self, card: Card):
+    def discard(self, card: Card):
         """
         Delete a card from hand via card class
         """
         Card.ensure_a_card_class(card)
 
-        self.cards.remove(card)
+        self._cards.remove(card)
 
-    def count_points(self) -> int:
+    def calculate_score(self) -> int:
         """
         Compute total points based on 41 rules:
         - Score is the maximum suit-sum
         - Minus the value of all cards not in that suit
+        Note:
+        - Only count based on the known card
         """
         sums = {suit: 0 for suit in CardSuit}
         for card in self.cards:
+            if card.is_unknown:
+                continue
             sums[card.suit] += card.get_value()
 
         max_suit_sum = max(sums.values())
