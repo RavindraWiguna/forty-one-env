@@ -64,9 +64,11 @@ class Card:
 
     CARD_VALUE_INDEX = 1
 
-    def __init__(self, rank: CardRank, suit: CardSuit):
+    def __init__(self, rank: CardRank | None, suit: CardSuit | None):
         self.rank = rank
         self.suit = suit
+        self.is_unknown = True if rank is None or suit is None else False
+        self.is_seen_by_all_player = False  # denote if a card ever discarded to garbage
 
     def __str__(self):
         return f"{self.rank}{self.suit}"
@@ -77,13 +79,42 @@ class Card:
     def get_value(self):
         """
         return a card value based on 41 game rule
+        Note:
+            - Unknown card is returned with 0
         """
+        if self.is_unknown:
+            return 0
         return self.rank.value[self.CARD_VALUE_INDEX]
 
     @staticmethod
     def ensure_a_card_class(obj: Any):
         if not isinstance(obj, Card):
             raise ValueError(f"{obj} is not a type of Card class")
+
+
+# singleton unknown card
+class UnknownCard(Card):
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        if getattr(self, "_initialized", False):
+            return
+        super().__init__(rank=None, suit=None)
+        self._initialized = True
+
+    def __setattr__(self, key, value):
+        raise AttributeError("UnknownCard is immutable and cannot be modified")
+
+    def __str__(self):
+        return "??"
+
+
+UNKNOWN_CARD = UnknownCard()
 
 
 class CardDeck:
