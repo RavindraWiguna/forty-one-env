@@ -1,4 +1,4 @@
-from forty_one import Card, CardSuit
+from forty_one.card import Card, CardSuit
 
 
 class Hand:

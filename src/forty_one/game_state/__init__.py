@@ -1,3 +1,3 @@
-from .hand import Hand
+from .game_state import VisibleGameState, FullGameState
 
-__all__ = ["Hand"]
+__all__ = ["VisibleGameState", "FullGameState"]
