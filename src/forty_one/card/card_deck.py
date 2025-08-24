@@ -32,7 +32,8 @@ class CardDeck:
         """
         Shuffle a deck of card in place
         """
-        random.shuffle(self.cards)
+        for _ in range(4):
+            random.shuffle(self.cards)
 
     def deal(self, n: int = 1) -> list[Card]:
         """
