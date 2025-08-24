@@ -89,6 +89,14 @@ class Card:
         if not isinstance(obj, Card):
             raise ValueError(f"{obj} is not a type of Card class")
 
+    def __eq__(self, other):
+        if not isinstance(other, Card):
+            return False
+        return self.rank == other.rank and self.suit == other.suit
+
+    def __hash__(self):
+        return hash((self.suit, self.rank))
+
 
 # singleton unknown card
 class UnknownCard(Card):
@@ -102,8 +110,10 @@ class UnknownCard(Card):
     def __init__(self):
         if getattr(self, "_initialized", False):
             return
-        super().__init__(rank=None, suit=None)
-        self._initialized = True
+        object.__setattr__(self, "rank", None)
+        object.__setattr__(self, "suit", None)
+        object.__setattr__(self, "_initialized", True)
+        object.__setattr__(self, "is_unknown", True)
 
     def __setattr__(self, key, value):
         raise AttributeError("UnknownCard is immutable and cannot be modified")

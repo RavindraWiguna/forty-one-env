@@ -14,5 +14,5 @@ class Action(StrEnum):
     2. TAKE_FROM_DISCARD: Take a card from previous player's discard
     """
 
-    TAKE_FROM_DECK: auto
-    TAKE_FROM_DISCARD: auto
+    TAKE_FROM_DECK = auto()
+    TAKE_FROM_DISCARD = auto()

@@ -5,7 +5,7 @@ from forty_one.card import Hand
 from copy import deepcopy
 
 
-class SimpleHeuristic(BasePlayer):
+class SimpleHeuristicPlayer(BasePlayer):
     def __init__(self, name="SimpleHeuristic"):
         super().__init__(name)
 
@@ -43,7 +43,7 @@ class SimpleHeuristic(BasePlayer):
         max_score_if_take_discard = -1
         if game_state.player_discards[0]:
             mutable_hand.add(game_state.player_discards[0][0])
-            max_score_if_take_discard = self._simple_discard_logic(mutable_hand)
+            _, max_score_if_take_discard = self._simple_discard_logic(mutable_hand)
 
         if avg_take_from_possible_deck > max_score_if_take_discard:
             return Action.TAKE_FROM_DECK
@@ -52,4 +52,5 @@ class SimpleHeuristic(BasePlayer):
 
     def discard_card(self, game_state: VisibleGameState):
         mutable_hand = deepcopy(game_state.player_hands[0])
-        return self._simple_discard_logic(mutable_hand)
+        idx_to_discard, _ = self._simple_discard_logic(mutable_hand)
+        return idx_to_discard

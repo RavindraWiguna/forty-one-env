@@ -29,7 +29,7 @@ class Hand:
         """
         Delete a card from hand via its index
         """
-        self._cards.pop(index)
+        return self._cards.pop(index)
 
     def discard(self, card: Card):
         """
@@ -66,3 +66,9 @@ class Hand:
 
     def __iter__(self):
         return iter(self._cards)
+
+    def __str__(self):
+        return str(self._cards)
+
+    def __repr__(self):
+        return self.__str__()

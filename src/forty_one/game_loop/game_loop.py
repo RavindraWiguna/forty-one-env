@@ -27,8 +27,8 @@ class GameLoop:
 
         self.player_hands = self._init_player_hands()
 
-        self.player_discards = []
-        self.seen_cards = []
+        self.player_discards = [[] for _ in range(self.total_player)]
+        self.seen_cards = [set() for _ in range(self.total_player)]
 
     def _init_player_hands(self):
         hands: list[Hand] = []
@@ -63,6 +63,7 @@ class GameLoop:
         visible_hands = []
         for i in range(self.total_player):
             if i == curr_player_idx:
+                visible_hands.append(self.player_hands[i])
                 continue
 
             obscured_hand = self._obscure_player_hand(curr_player_idx, i)
@@ -92,15 +93,17 @@ class GameLoop:
         for i in range(self.total_player):
             self.seen_cards[i].add(card)
 
-    def _check_if_game_ended(self, curr_player_idx: int):
+    def _check_if_game_continue(self, curr_player_idx: int):
         curr_player_score = self.player_hands[curr_player_idx].calculate_score()
         if curr_player_score == self.TARGET_SCORE:
-            return True
+            print("Ended via target score reached")
+            return False
 
         if len(self.deck) == 0:
-            return True
+            print("No more deck left")
+            return False
 
-        return False
+        return True
 
     def _get_game_result(self):
         player_scores: list[ScoreData] = []
@@ -115,7 +118,7 @@ class GameLoop:
             if player_score == self.TARGET_SCORE:
                 reached_target_score.append(player_identifier)
         game_result = GameResult(
-            sorted_scores=sorted(player_scores, key=lambda x: x.score),
+            sorted_scores=sorted(player_scores, key=lambda x: x.score, reverse=True),
             reached_target_score=reached_target_score,
         )
         return game_result
@@ -193,16 +196,14 @@ class GameLoop:
                 player_ai.name,
                 f"has choosen to discard: {discarded_card}",
             )
-
-            self.player_discards[curr_player_idx] = self.player_hands[
-                curr_player_idx
-            ].discard_at(discarded_card_idx)
+            self.player_hands[curr_player_idx].discard_at(discarded_card_idx)
+            self.player_discards[curr_player_idx].append(discarded_card)
 
             # mark it as seen by all player
             self._mark_card_as_seen(discarded_card)
 
             # check game ended
-            isPlaying = self._check_if_game_ended(curr_player_idx)
+            isPlaying = self._check_if_game_continue(curr_player_idx)
             turn_number += 1
 
     def play(self):
