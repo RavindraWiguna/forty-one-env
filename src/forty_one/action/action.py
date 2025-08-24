@@ -16,3 +16,6 @@ class Action(StrEnum):
 
     TAKE_FROM_DECK = auto()
     TAKE_FROM_DISCARD = auto()
+
+    def __repr__(self):
+        return self.value
