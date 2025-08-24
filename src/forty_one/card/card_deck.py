@@ -19,11 +19,14 @@ class CardDeck:
         ]
         self.reset()
 
+    def get_copy_unshuffled_card(self):
+        return deepcopy(self._unshuffled_card)
+
     def reset(self):
         """
         Reset the deck into ordered 52 cards
         """
-        self.cards = deepcopy(self._unshuffled_card)
+        self.cards = self.get_copy_unshuffled_card()
 
     def shuffle(self):
         """

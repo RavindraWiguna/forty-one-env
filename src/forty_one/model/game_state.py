@@ -1,4 +1,4 @@
-from forty_one.card import Card, CardDeck, Hand
+from forty_one.card import Card, Hand
 from dataclasses import dataclass
 
 
@@ -20,23 +20,4 @@ class VisibleGameState:
     player_hands: list[Hand]
     player_discards: list[list[Card]]
     total_card_in_deck: int
-    possible_deck_card: list[Card]
-
-
-@dataclass
-class FullGameState:
-    """
-    Game state of the whole game
-
-    All card is revealed ( no hidden one )
-    It has:
-    - Hand of each player
-    - Current state of player discard
-    - Current state of the dect
-    - dictionary consist of set of seen card by players
-    """
-
-    player_hands: list[Hand]
-    player_discards: list[list[Card]]
-    deck: CardDeck
-    seen_cards: dict[str, set[Card]]
+    possible_deck_card: set[Card]

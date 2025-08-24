@@ -4,7 +4,7 @@ Define an abstract base player class for all type of player down the line
 
 from abc import ABC, abstractmethod
 
-from forty_one.game_state import VisibleGameState
+from forty_one.model import VisibleGameState
 from forty_one.action import Action
 
 
@@ -28,7 +28,7 @@ class BasePlayer(ABC):
         )
 
     @abstractmethod
-    def discard_card(self, game_state: VisibleGameState):
+    def discard_card(self, game_state: VisibleGameState) -> int:
         """
         Define an interna logic of decision making from the player
         """

@@ -38,6 +38,9 @@ class Hand:
 
         self._cards.remove(card)
 
+    def __len__(self):
+        return len(self._cards)
+
     def calculate_score(self) -> int:
         """
         Compute total points based on 41 rules:

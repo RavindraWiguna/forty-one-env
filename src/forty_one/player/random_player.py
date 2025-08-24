@@ -1,4 +1,4 @@
-from forty_one.game_state import VisibleGameState
+from forty_one.model import VisibleGameState
 from forty_one.action import Action
 from forty_one.player import BasePlayer
 import random
