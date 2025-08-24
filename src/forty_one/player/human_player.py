@@ -29,17 +29,14 @@ class HumanPlayer(BasePlayer):
         valid_action = [Action.TAKE_FROM_DECK]
         if game_state.player_discards[0]:
             valid_action.append(Action.TAKE_FROM_DISCARD)
+        act_dx = None
 
         def get_valid_action():
             print("Choose one of these action")
             print(valid_action)
-            act_idx = int(input("Input index of the action to take:"))
-            if act_idx > len(valid_action):
-                raise ValueError(
-                    "Not a valid index, must be within length of valid action"
-                )
-
-            return act_idx
+            my_dx = int(input("Input index of the action to take:"))
+            _ = valid_action[my_dx]
+            return my_dx
 
         act_dx = self.get_human_input(get_valid_action)
         return valid_action[act_dx]
@@ -49,6 +46,7 @@ class HumanPlayer(BasePlayer):
 
         def get_idx():
             idx = int(input("What index to discard? (0 indexed):"))
+            _ = game_state.player_hands[0].card_at(idx)
             return idx
 
         idx_to_discard = self.get_human_input(get_idx)
