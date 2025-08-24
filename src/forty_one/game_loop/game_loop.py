@@ -18,7 +18,7 @@ class GameLoop:
         self.total_player = len(self.players)
         self.ordered_deck = set(self.deck.get_copy_unshuffled_card())
         self.player_hands = []
-        self.player_discards = []
+        self.player_discards: list[list[Card]] = []
         self.seen_cards: list[set[Card]] = []
 
     def _restart_game(self):
@@ -30,15 +30,15 @@ class GameLoop:
         self.player_discards = []
         self.seen_cards = []
 
-    def _init_player_hands(self) -> list[Hand]:
-        hands = []
+    def _init_player_hands(self):
+        hands: list[Hand] = []
         for _ in self.players:
             cards = self.deck.deal(self.CARD_PER_PLAYER)
             hands.append(Hand(cards=cards))
 
         return hands
 
-    def _obscure_player_hand(self, curr_player_idx: int, tgt_player_idx: int) -> Hand:
+    def _obscure_player_hand(self, curr_player_idx: int, tgt_player_idx: int):
         """
         Obscure a player hand based on the knowledge of current player
         """
@@ -52,14 +52,14 @@ class GameLoop:
         random.shuffle(obscured_hand)
         return Hand(cards=obscured_hand)
 
-    def _rotate_list(self, list_to_rotate: list, start_idx: int) -> list:
+    def _rotate_list(self, list_to_rotate: list, start_idx: int):
         return list_to_rotate[start_idx:] + list_to_rotate[:start_idx]
 
-    def _get_possible_deck_card(self, curr_player_idx: int) -> set[Card]:
+    def _get_possible_deck_card(self, curr_player_idx: int):
         possible_deck_card = self.ordered_deck - self.seen_cards[curr_player_idx]
         return possible_deck_card
 
-    def _create_visible_game_state(self, curr_player_idx: int) -> VisibleGameState:
+    def _create_visible_game_state(self, curr_player_idx: int):
         visible_hands = []
         for i in range(self.total_player):
             if i == curr_player_idx:
@@ -82,7 +82,7 @@ class GameLoop:
         )
         return visible_game_state
 
-    def _prev_player_has_discard(self, curr_player_idx: int) -> bool:
+    def _prev_player_has_discard(self, curr_player_idx: int):
         return bool(self.player_discards[curr_player_idx - 1])
 
     def _print_player_move(self, curr_player_idx: int, player_name: str, message: str):
@@ -92,7 +92,7 @@ class GameLoop:
         for i in range(self.total_player):
             self.seen_cards[i].add(card)
 
-    def _check_if_game_ended(self, curr_player_idx: int) -> bool:
+    def _check_if_game_ended(self, curr_player_idx: int):
         curr_player_score = self.player_hands[curr_player_idx].calculate_score()
         if curr_player_score == self.TARGET_SCORE:
             return True
@@ -102,7 +102,7 @@ class GameLoop:
 
         return False
 
-    def _get_game_result(self) -> GameResult:
+    def _get_game_result(self):
         player_scores: list[ScoreData] = []
         reached_target_score: list[PlayerIdentifier] = []
         for i, player_hand in enumerate(self.player_hands):
@@ -136,6 +136,28 @@ class GameLoop:
                     f"[{i+1}] #{score_data.player_id.index}:{score_data.player_id.name} [{score_data.score}]"
                 )
 
+    def _get_last_discarded_card(self, curr_player_idx: int):
+        return self.player_discards[curr_player_idx - 1].pop()
+
+    def _get_card_to_add(
+        self, player_action: Action, curr_player_idx: int, player_name: str
+    ):
+        card_to_add = None
+        if player_action == Action.TAKE_FROM_DISCARD:
+            if self._prev_player_has_discard(curr_player_idx):
+                card_to_add = self._get_last_discarded_card(curr_player_idx)
+            else:
+                self._print_player_move(
+                    curr_player_idx,
+                    player_name,
+                    "unable to take from discard, taking from deck instead",
+                )
+
+        # player choose to take from deck or unable to take from discard
+        if card_to_add is None:
+            card_to_add = self.deck.deal(1)[0]
+        return card_to_add
+
     def _main_loop(self):
         isPlaying = True
         turn_number = 0
@@ -151,20 +173,9 @@ class GameLoop:
                 curr_player_idx, player_ai.name, f"has choosen to {player_action}"
             )
 
-            card_to_add = None
-            if player_action == Action.TAKE_FROM_DISCARD:
-                if self._prev_player_has_discard(curr_player_idx):
-                    card_to_add = self.player_discards.pop(0)
-                else:
-                    self._print_player_move(
-                        curr_player_idx,
-                        player_ai.name,
-                        "unable to take from discard, taking from deck instead",
-                    )
-
-            # player choose to take from deck or unable to take from discard
-            if card_to_add is None:
-                card_to_add = self.deck.deal(1)
+            card_to_add = self._get_card_to_add(
+                player_action, curr_player_idx, player_ai.name
+            )
 
             # add this card to seen card for this player
             self.seen_cards[curr_player_idx].add(card_to_add)

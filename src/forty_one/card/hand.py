@@ -1,4 +1,5 @@
 from forty_one.card import Card, CardSuit
+from copy import deepcopy
 
 
 class Hand:
@@ -50,7 +51,7 @@ class Hand:
         - Only count based on the known card
         """
         sums = {suit: 0 for suit in CardSuit}
-        for card in self.cards:
+        for card in self._cards:
             if card.is_unknown:
                 continue
             sums[card.suit] += card.get_value()
@@ -59,3 +60,9 @@ class Hand:
         total = sum(sums.values())
         # read: max_suite_sum - value_of_other_suit , where value_other_suit = total - max_suite_sum
         return 2 * max_suit_sum - total
+
+    def get_copy_cards(self):
+        return deepcopy(self._cards)
+
+    def __iter__(self):
+        return iter(self._cards)

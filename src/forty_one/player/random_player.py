@@ -5,7 +5,7 @@ import random
 
 
 class RandomPlayer(BasePlayer):
-    def __init__(self, name="Player"):
+    def __init__(self, name="Random"):
         super().__init__(name)
 
     def choose_action(self, game_state: VisibleGameState):
